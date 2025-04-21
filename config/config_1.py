@@ -1,0 +1,11 @@
+app_number = 1696
+user_number = 702
+app_embedding_dim = 200
+user_embedding_dim = 50
+seq_length = 7
+train_epochs = 30
+learning_rate = 1e-4
+batch_size = 256
+model_name = "lstm"  # "lstm" or "attn"
+Dataset_Path = "Dataset"
+Save_Path = "Save"
