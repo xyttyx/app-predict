@@ -10,9 +10,10 @@ import torch.optim as optim
 
 from sklearn.model_selection import train_test_split
 
-from config import config_lstm as config
+from config import config_lstm
+from config import config_attn
 
-def main():
+def main(config):
     # 加载配置文件
     app_number = config.app_number
     user_number = config.user_number
@@ -40,6 +41,11 @@ def main():
         print("Using GPU")
     else:
         print("Using CPU")
+    
+    if use_poi:
+        print("Using POI embedding")
+    else:
+        print("Not using POI embedding")
         
     # 加载数据集
     dataset = AppDataset(DatasetPath=Dataset_Path, length=seq_length)
@@ -73,8 +79,8 @@ def main():
         ).to(device)
 
     # Load the model if it exists
-    if os.path.exists(os.path.join(Model_Save_Path, f"model_{model_name}_newest.pth")):
-        model.load_state_dict(torch.load(os.path.join(Model_Save_Path, f"model_{model_name}_newest.pth"), weights_only=True))
+    if os.path.exists(os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth")):
+        model.load_state_dict(torch.load(os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi__newest.pth"), weights_only=True))
         print("Model loaded successfully.")
     else:
         print("No model found, starting training from scratch.")
@@ -84,13 +90,14 @@ def main():
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=train_epochs, eta_min=1e-10)
 
     # 训练模型
-    for epoch in range(1, train_epochs + 1):    
+    for epoch in range(1, train_epochs + 1):
         Trainer(
             model=model,
             dataloader=train_dataloader,
             optimizer=optimizer,
             criterion=criterion,
             device=device,
+            epoch=epoch
         )
         if epoch % 10 == 0:
             Eval(
@@ -100,9 +107,10 @@ def main():
             )
         scheduler.step()
         # Save the model
-        torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_newest.pth"))
+        torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth"))
         if epoch % 5 == 0:
-            torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_{epoch}.pth"))
+            torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_{epoch}.pth"))
 
 if __name__ == "__main__":
-    main()
+    main(config_lstm)
+    main(config_attn)

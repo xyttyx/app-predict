@@ -11,6 +11,7 @@ def Trainer(
         optimizer,
         criterion,
         device,
+        epoch
     ):
     running_loss = 0.0
     correct = 0
@@ -36,5 +37,5 @@ def Trainer(
         
     accuracy = torch.sum(torch.cat(prediction_total) == torch.cat(target_total)).item() / len(torch.cat(target_total))
     loss = running_loss / len(dataloader)
-    print(f"Train: Loss: {loss:.4f} | Accuracy: {accuracy:.4f}")
+    print(f"Train Epoch: {epoch} | Loss: {loss:.4f} | Accuracy: {accuracy:.4f}")
         
