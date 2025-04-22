@@ -87,7 +87,7 @@ def main(config):
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=train_epochs, eta_min=1e-10)
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=train_epochs, eta_min=learning_rate / 100)
 
     # 训练模型
     for epoch in range(1, train_epochs + 1):
@@ -112,5 +112,6 @@ def main(config):
             torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_{epoch}.pth"))
 
 if __name__ == "__main__":
-    main(config_lstm)
     main(config_attn)
+    # main(config_lstm)
+    
