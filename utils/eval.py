@@ -22,8 +22,8 @@ def Eval(
             target_total.append(target)
 
         # Calculate metrics
-        y_total = torch.stack(y_total).cpu().numpy()
-        target_total = torch.stack(target_total).cpu().numpy()
+        y_total = torch.cat(y_total, dim=0).cpu().numpy()
+        target_total = torch.cat(target_total, dim=0).cpu().numpy()
         metrics_data = metrics(target_total, y_total, n_classes=model.app_number)
 
         # Print the metrics
