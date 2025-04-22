@@ -10,6 +10,8 @@ class ModelLSTM(nn.Module):
             user_embedding_dim=50,
             seq_length=8,
             num_layers=1,
+            use_poi = False,
+            poi_embedding = None,
         ):
         super(ModelLSTM, self).__init__()
         self.app_number = app_number
@@ -17,7 +19,11 @@ class ModelLSTM(nn.Module):
         time_dim = 24 + 30 # 24小时 + 30分钟
         self.app_embedding = nn.Embedding(app_number, app_embedding_dim)
         self.user_embedding = nn.Embedding(user_number, user_embedding_dim)
-        self.lstm_input_dim = app_embedding_dim + time_dim
+        if use_poi:
+            self.poi_embedding = nn.Embedding.from_pretrained(poi_embedding, freeze=True)
+            self.lstm_input_dim = app_embedding_dim + time_dim + poi_embedding.size(1)
+        else:
+            self.lstm_input_dim = app_embedding_dim + time_dim
         self.num_layers = num_layers
         self.LSTM = nn.LSTM(
             input_size=self.lstm_input_dim,

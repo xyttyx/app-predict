@@ -40,4 +40,14 @@ class AppDataset(Dataset):
     
     def __getitem__(self, i):
         return self.App_usage_trace[i]
-            
+
+def load_poi_embedding(file_name=None, DatasetPath="Dataset"):
+    if file_name is None:
+        file_name = "base_poi.txt"
+    poi_embedding_path = os.path.join(DatasetPath, file_name)
+    with open(poi_embedding_path, "r") as f:
+        poi_embedding = f.readlines()[1:]
+        poi_embedding = [line.strip().split()[1:] for line in poi_embedding]
+        poi_embedding = torch.tensor([[float(j) for j in i] for i in poi_embedding])
+        poi_embedding = F.normalize(poi_embedding, dim=1)
+    return poi_embedding  

@@ -1,6 +1,6 @@
 import os
 
-from utils import AppDataset, Trainer, Eval
+from utils import AppDataset, Trainer, Eval, load_poi_embedding
 from Models import ModelAttention, ModelLSTM
 
 import torch
@@ -25,6 +25,7 @@ def main():
     model_name = config.model_name  
     Dataset_Path = config.Dataset_Path
     Save_Path = config.Save_Path
+    use_poi = config.use_poi
     if not os.path.exists(Save_Path):
         os.makedirs(Save_Path)
     Model_Save_Path = os.path.join(Save_Path, "model")
@@ -39,13 +40,13 @@ def main():
         print("Using GPU")
     else:
         print("Using CPU")
+        
     # 加载数据集
     dataset = AppDataset(DatasetPath=Dataset_Path, length=seq_length)
-    # 划分训练集和验证集
     train_data, val_data = train_test_split(dataset.App_usage_trace, test_size=0.2, random_state=42)
-
     train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, shuffle=True)
     val_dataloader = torch.utils.data.DataLoader(val_data, batch_size=batch_size, shuffle=False)
+    poi_embedding = load_poi_embedding(DatasetPath=Dataset_Path) if use_poi else None
 
     # 初始化模型
     if model_name == "lstm":
@@ -56,6 +57,8 @@ def main():
             app_embedding_dim=app_embedding_dim,
             user_embedding_dim=user_embedding_dim,
             seq_length=seq_length,
+            use_poi=use_poi,
+            poi_embedding=poi_embedding,
         ).to(device)
     elif model_name == "attn":
         print("Using attention model")
@@ -65,6 +68,8 @@ def main():
             app_embedding_dim=app_embedding_dim,
             user_embedding_dim=user_embedding_dim,
             seq_length=seq_length,
+            use_poi=use_poi,
+            poi_embedding=poi_embedding,
         ).to(device)
 
     # Load the model if it exists

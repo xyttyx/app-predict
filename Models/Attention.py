@@ -9,15 +9,21 @@ class ModelAttention(nn.Module):
             app_embedding_dim=200,
             user_embedding_dim=50,
             seq_length=8,
+            use_poi = False,
+            poi_embedding = None,
         ):
         super(ModelAttention, self).__init__()
         self.app_number = app_number
         self.user_number = user_number
         self.app_embedding = nn.Embedding(app_number, app_embedding_dim)
         self.user_embedding = nn.Embedding(user_number, user_embedding_dim)
-        time_dim = 24 + 30 # 24小时 + 30分钟
-        self.attention = nn.MultiheadAttention(app_embedding_dim + time_dim, num_heads=1, batch_first=True)
-        self.fc_dim = app_embedding_dim + user_embedding_dim + time_dim
+        time_dim = 24 + 30 # 24小时 + 30个分钟时段
+        attention_dim = app_embedding_dim + time_dim
+        if use_poi:
+            self.poi_embedding = nn.Embedding.from_pretrained(poi_embedding, freeze=True)
+            attention_dim += poi_embedding.size(1)
+        self.attention = nn.MultiheadAttention(attention_dim, num_heads=1, batch_first=True)
+        self.fc_dim = attention_dim + time_dim
         self.fc = nn.Sequential(
             nn.Linear(self.fc_dim, self.fc_dim),
             nn.Tanh(),
