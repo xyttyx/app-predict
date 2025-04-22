@@ -23,8 +23,7 @@ class ModelAttention(nn.Module):
             self.poi_embedding = nn.Embedding.from_pretrained(poi_embedding, freeze=True)
             attention_dim += poi_embedding.size(1)
         self.attention = nn.MultiheadAttention(attention_dim, num_heads=1, batch_first=True)
-        self.weights = nn.Parameter(torch.ones(seq_length) / seq_length, requires_grad=True)
-        self.weights = self.weights.unsqueeze(0).unsqueeze(2)
+        self.weights = nn.Parameter(torch.ones(1, seq_length, 1) / seq_length, requires_grad=True)
         self.fc_dim = attention_dim + user_embedding_dim
         self.fc = nn.Sequential(
             nn.Linear(self.fc_dim, self.fc_dim),
