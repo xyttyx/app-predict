@@ -36,9 +36,15 @@ def main(config):
         os.makedirs(Model_Save_Path)
 
     # 检查是否有GPU可用
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() 
+        else "mps" if torch.backends.mps.is_available() 
+        else "cpu"
+    )
     if device.type == "cuda":
         print("Using GPU")
+    elif device.type == "mps":
+        print("Using Apple Silicon GPU")
     else:
         print("Using CPU")
     
