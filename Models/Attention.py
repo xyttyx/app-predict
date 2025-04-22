@@ -47,8 +47,9 @@ class ModelAttention(nn.Module):
             poi = x[:, :, 3]
             poi = self.poi_embedding(poi)
             input = torch.cat([input, poi], dim=2)
-        attn_output, attn_output_weights = self.attention(input, input, input)
-        attn_output = attn_output * self.weights
+        attn_output, _ = self.attention(input, input, input)
+        weight = F.softmax(self.weights, dim=1)
+        attn_output = attn_output * weight
         attn_output = attn_output.sum(dim=1)
         middle = F.tanh(torch.cat((attn_output, users), dim=1))
         out = self.fc(middle)
