@@ -41,5 +41,3 @@ class AppDataset(Dataset):
     def __getitem__(self, i):
         return self.App_usage_trace[i]
             
-
-                
