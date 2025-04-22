@@ -25,6 +25,8 @@ def main():
     model_name = config.model_name  
     Dataset_Path = config.Dataset_Path
     Save_Path = config.Save_Path
+    if not os.path.exists(Save_Path):
+        os.makedirs(Save_Path)
     Model_Save_Path = os.path.join(Save_Path, "model")
     if not os.path.exists(Save_Path):
         os.makedirs(Save_Path)
