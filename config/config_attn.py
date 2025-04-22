@@ -9,4 +9,4 @@ batch_size = 256
 model_name = "attn"  # "lstm" or "attn"
 Dataset_Path = "Dataset"
 Save_Path = "Save"
-use_poi = True
+use_poi = True  # True or False
