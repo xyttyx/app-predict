@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_LAUNCH_BLOCKING']='1'
+
 from utils import AppDataset, Trainer, Eval
 from Models import ModelAttention, ModelLSTM
 
