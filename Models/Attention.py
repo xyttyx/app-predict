@@ -33,7 +33,7 @@ class ModelAttention(nn.Module):
         )
 
     def forward(self, x):
-        # 顺序：user hour minute app
+        # 顺序：user hour minute poi app
         apps = x[:, :, -1]
         users = x[:, 0, 0]
         hours = F.one_hot(x[:, :, 1], num_classes=24).float()
@@ -42,6 +42,10 @@ class ModelAttention(nn.Module):
         apps = self.app_embedding(apps)
         users = self.user_embedding(users)
         input = torch.cat([apps, times], dim=2)
+        if hasattr(self, 'poi_embedding'):
+            poi = x[:, :, 3]
+            poi = self.poi_embedding(poi)
+            input = torch.cat([input, poi], dim=2)
         attn_output, attn_output_weights = self.attention(input, input, input)
         attn_output = attn_output.mean(dim=1).squeeze(1)
         middle = F.tanh(torch.cat((attn_output, users), dim=1))

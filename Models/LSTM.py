@@ -43,12 +43,20 @@ class ModelLSTM(nn.Module):
     def forward(self, x):
         apps = x[:, :, -1]
         users = x[:, 0, 0]
+
         hours = F.one_hot(x[:, :, 1], num_classes=24).float()
         minutes = F.one_hot(x[:, :, 2], num_classes=30).float()
         times = torch.cat([hours, minutes], dim=2)
+
         apps = self.app_embedding(apps)
         users = self.user_embedding(users)
         input = torch.cat([apps, times], dim=2)
+
+        if hasattr(self, 'poi_embedding'):
+            poi = x[:, :, 3]
+            poi = self.poi_embedding(poi)
+            input = torch.cat([input, poi], dim=2)
+
         (h0, c0) = (torch.zeros(self.num_layers, apps.size(0), self.lstm_input_dim).to(apps.device),
                     torch.zeros(self.num_layers, apps.size(0), self.lstm_input_dim).to(apps.device))
         
