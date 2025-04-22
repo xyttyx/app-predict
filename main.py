@@ -10,7 +10,7 @@ import torch.optim as optim
 
 from sklearn.model_selection import train_test_split
 
-from config import config_1 as config
+from config import config_lstm as config
 
 def main():
     # 加载配置文件
