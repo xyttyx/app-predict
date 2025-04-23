@@ -13,13 +13,16 @@ from sklearn.model_selection import train_test_split
 from config import config_lstm
 from config import config_attn
 
-def main(config):
+def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, user_embedding_dim:int|None = None):
     # 加载配置文件
     app_number = config.app_number
     user_number = config.user_number
-    app_embedding_dim = config.app_embedding_dim
-    user_embedding_dim = config.user_embedding_dim
-    seq_length = config.seq_length
+    if app_embedding_dim == None:
+        app_embedding_dim = config.app_embedding_dim
+    if user_embedding_dim == None:
+        user_embedding_dim = config.user_embedding_dim
+    if seq_length == None:
+        seq_length = config.seq_length
     train_epochs = config.train_epochs
     learning_rate = config.learning_rate
     batch_size = config.batch_size
@@ -105,7 +108,8 @@ def main(config):
             device=device,
             epoch=epoch
         )
-        if epoch % 10 == 0:
+        # if False:
+        if epoch % (train_epochs // 4) == 0 :
             Eval(
                 model=model,
                 dataloader=val_dataloader,
@@ -119,5 +123,5 @@ def main(config):
 
 if __name__ == "__main__":
     main(config_attn)
-    # main(config_lstm)
+    main(config_lstm)
     
