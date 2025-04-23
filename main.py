@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 from config import config_lstm
 from config import config_attn
 
-def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, user_embedding_dim:int|None = None):
+def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, user_embedding_dim:int|None = None, use_poi:bool|None = None):
     # 加载配置文件
     app_number = config.app_number
     user_number = config.user_number
@@ -29,7 +29,8 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
     model_name = config.model_name  
     Dataset_Path = config.Dataset_Path
     Save_Path = config.Save_Path
-    use_poi = config.use_poi
+    if use_poi == None:
+        use_poi = config.use_poi
     if not os.path.exists(Save_Path):
         os.makedirs(Save_Path)
     Model_Save_Path = os.path.join(Save_Path, "model")
@@ -108,8 +109,8 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
             device=device,
             epoch=epoch
         )
-        # if False:
-        if epoch % (train_epochs // 4) == 0 :
+        if False:
+        # if epoch % (train_epochs // 3) == 0 :
             Eval(
                 model=model,
                 dataloader=val_dataloader,
@@ -120,8 +121,12 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
         torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth"))
         if epoch % 5 == 0:
             torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_{epoch}.pth"))
-
+    Eval(
+        model=model,
+        dataloader=val_dataloader,
+        device=device,
+    )
 if __name__ == "__main__":
-    main(config_attn)
-    main(config_lstm)
+    main(config_attn, use_poi=False)
+    main(config_lstm, use_poi=False)
     
