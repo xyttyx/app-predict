@@ -3,14 +3,10 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
 
 from sklearn.metrics import silhouette_score, calinski_harabasz_score
 from sklearn.cluster import KMeans
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 from Models import ModelLSTM
