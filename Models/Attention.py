@@ -11,6 +11,8 @@ class ModelAttention(nn.Module):
             seq_length=8,
             use_poi = False,
             poi_embedding = None,
+            poi_number = 9851,
+            poi_embedding_dim=17,
         ):
         super(ModelAttention, self).__init__()
         self.app_number = app_number
@@ -20,6 +22,10 @@ class ModelAttention(nn.Module):
         time_dim = 24 + 30 # 24小时 + 30个分钟时段
         attention_dim = app_embedding_dim + time_dim
         if use_poi:
+            if poi_embedding is not None:
+                poi_embedding = torch.tensor(poi_embedding)
+            else:
+                poi_embedding = torch.randn(poi_number, poi_embedding_dim)
             self.poi_embedding = nn.Embedding.from_pretrained(poi_embedding, freeze=True)
             attention_dim += poi_embedding.size(1)
         self.attention = nn.MultiheadAttention(attention_dim, num_heads=1, batch_first=True)

@@ -35,10 +35,16 @@ def main(config):
     if not os.path.exists(Model_Save_Path):
         os.makedirs(Model_Save_Path)
 
-    # 检查是否有GPU可用
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # 检查是否有可用的加速设备
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() 
+        else "mps" if torch.backends.mps.is_available() 
+        else "cpu"
+    )
     if device.type == "cuda":
         print("Using GPU")
+    elif device.type == "mps":
+        print("Using Apple Silicon GPU")
     else:
         print("Using CPU")
     
@@ -78,7 +84,7 @@ def main(config):
             poi_embedding=poi_embedding,
         ).to(device)
 
-    # Load the model if it exists
+    # 加载模型
     if os.path.exists(os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth")):
         model.load_state_dict(torch.load(os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth"), weights_only=True))
         print("Model loaded successfully.")
@@ -106,7 +112,7 @@ def main(config):
                 device=device,
             )
         scheduler.step()
-        # Save the model
+        # 保存模型
         torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth"))
         if epoch % 5 == 0:
             torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_{epoch}.pth"))
