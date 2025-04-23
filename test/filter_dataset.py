@@ -21,8 +21,6 @@ with open(App_usage_trace_path, "r") as f:
             int(line[3])
         )
 
-
-
 filtered_App_usage_trace = []
 for item in App_usage_trace:
     if len(filtered_App_usage_trace) == 0:
