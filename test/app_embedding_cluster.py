@@ -9,18 +9,18 @@ from sklearn.cluster import KMeans
 
 import numpy as np
 
-from Models import ModelLSTM
-from config import config_lstm
+from Models import ModelLSTM, ModelAttention
+from config import config_attn as config
 
-app_number = config_lstm.app_number
-user_number = config_lstm.user_number
-app_embedding_dim = config_lstm.app_embedding_dim
-user_embedding_dim = config_lstm.user_embedding_dim
-seq_length = config_lstm.seq_length
+app_number = config.app_number
+user_number = config.user_number
+app_embedding_dim = config.app_embedding_dim
+user_embedding_dim = config.user_embedding_dim
+seq_length = config.seq_length
 use_poi = True
 poi_embedding = None
 
-model = ModelLSTM(
+model = ModelAttention(
             app_number=app_number,
             user_number=user_number,
             app_embedding_dim=app_embedding_dim,
@@ -28,9 +28,9 @@ model = ModelLSTM(
             seq_length=seq_length,
             use_poi=use_poi,
             poi_embedding=poi_embedding,
-        )
+        ).to(device='cpu')
 
-model.load_state_dict(torch.load("./Save/model/model_lstm_with_poi_newest.pth"))
+model.load_state_dict(torch.load("./Save/model/model_attn_with_poi_newest.pth", map_location=torch.device('cpu')))
 app_embedding = model.app_embedding.weight.data.cpu().numpy()
 
 with open("Dataset/App2Category.txt", "r") as f:
@@ -60,4 +60,4 @@ print(f"Silhouette Score = {score:.3f}")
 score = calinski_harabasz_score(X_scaled, labels)
 print(f"CH Index = {score:.1f}")
 
-# 轮廓系数-0.437，表明真实标签的聚类效果不好，可能是因为嵌入的维度过高，或者数据本身的分布不适合聚类。
+# lstm的app嵌入向量，轮廓系数-0.437，表明真实标签的聚类效果不好，可能是因为嵌入的维度过高，或者数据本身的分布不适合聚类。
