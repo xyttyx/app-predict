@@ -10,7 +10,7 @@ class AppDataset(Dataset):
         super(AppDataset, self).__init__()
         if file_name is None:
             #使用经过预处理的数据集，该数据集去除了使用记录过短或过长的用户，并对用户编号进行了重新映射
-            file_name = "App_usage_trace_preprocessed.txt"
+            file_name = "App_usage_trace_filtered.txt"
         App_usage_trace_path = os.path.join(DatasetPath, file_name)
         with open(App_usage_trace_path, "r") as f:
             App_usage_trace = f.readlines()
