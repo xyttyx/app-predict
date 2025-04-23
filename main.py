@@ -127,6 +127,6 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
         device=device,
     )
 if __name__ == "__main__":
-    main(config_attn, use_poi=False)
-    main(config_lstm, use_poi=False)
+    main(config_attn, use_poi=True)
+    main(config_lstm, use_poi=True)
     
