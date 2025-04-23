@@ -41,7 +41,7 @@ with open("Dataset/App2Category.txt", "r") as f:
     catagory = [int(line[1]) for line in catagory]
     catagory = np.array(catagory)
 
-tsne_2d = TSNE(n_components=2, random_state=42, )
+tsne_2d = TSNE(n_components=2, random_state=42)
 embedding_2d = tsne_2d.fit_transform(app_embedding)
 
 # 画图
