@@ -90,7 +90,10 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
 
     # 加载模型
     if os.path.exists(os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth")):
-        model.load_state_dict(torch.load(os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth"), weights_only=True))
+        model.load_state_dict(torch.load(os.path.join(Model_Save_Path, 
+                                                      f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth"), 
+                                                      weights_only=True,
+                                                      map_location="cpu"))
         print("Model loaded successfully.")
     else:
         print("No model found, starting training from scratch.")
