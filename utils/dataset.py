@@ -27,6 +27,7 @@ class AppDataset(Dataset):
                     int(line[3])
                 ))
             App_usage_trace = torch.stack(App_usage_trace)
+            self.App_usage_trace_origin = App_usage_trace
             # 生成序列，每个序列的长度为length
             self.App_usage_trace = []
             for i in range(len(App_usage_trace) - (length + 1)):
