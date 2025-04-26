@@ -31,7 +31,6 @@ model = ModelAttention(
         ).to(device='cpu')
 
 model.load_state_dict(torch.load("./Dataset/model_attn_with_poi_newest.pth", map_location=torch.device('cpu')))'''
-app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False)
 
 with open("Dataset/App2Category.txt", "r") as f:
     catagory = f.readlines()
@@ -39,6 +38,7 @@ with open("Dataset/App2Category.txt", "r") as f:
     catagory = [int(line[1]) for line in catagory]
     catagory = np.array(catagory)
 
+app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False).cpu().numpy()
 X_scaled = app_embedding
 
 print("Silhouette Score and Calinski-Harabasz Index for different number of clusters:")
