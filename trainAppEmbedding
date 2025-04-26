@@ -38,11 +38,11 @@ model = DeepWalkWeighted(
     edge_weight=edge_weight_app,
     embedding_size=200,
     walk_length=5,
-    num_walks=30,
+    num_walks=20,
     batch_size=256,
     lr = 5e-3,
-    epochs=50,
-    sampling_times=10,
+    epochs=30,
+    sampling_times=5,
     device=device
 )
 

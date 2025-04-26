@@ -1,3 +1,7 @@
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -114,14 +118,12 @@ class DeepWalkWeighted:
     
     def generate_training_data(self, walks) -> Tuple[torch.Tensor, torch.Tensor]:
         """从随机游走生成训练数据(目标词-上下文词对)"""
-        middle = self.walk_length // 2
-        target_origin = walks[:, middle]
         targets = []
         contexts = []
-        for i in range(self.walk_length):
-            if i != middle:
-                targets = np.concat([targets,target_origin])
-                contexts = np.concat([contexts, walks[:, i]])
+        for i in range(self.walk_length - 1):
+            for j in range(i + 1, self.walk_length):
+                targets = np.concat([targets ,walks[:, i]])
+                contexts = np.concat([contexts, walks[:, j]])
         targets = torch.tensor(targets,dtype=torch.long,device=self.device)
         contexts = torch.tensor(contexts,dtype=torch.long,device=self.device)
         return targets, contexts
@@ -162,7 +164,9 @@ class DeepWalkWeighted:
                     total_loss += loss.item()
                 
                 print(f"Epoch {epoch+1}/{self.epochs}, Loss: {total_loss/len(dataloader):.4f}")
+            
             self.model.normalize_embeddings()
+            torch.save(self.model.get_embeddings().cpu(), "./Dataset/app_embeddings.pt")
         # 获取嵌入矩阵
-        embeddings = self.model.get_embeddings()
+        embeddings = self.model.get_embeddings().cpu()
         return embeddings
