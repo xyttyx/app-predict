@@ -6,9 +6,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+from torch_geometric.utils import negative_sampling
+
 import numpy as np
-import random
-from typing import List, Dict, Tuple
+
+from typing import List, Tuple
 from tqdm import tqdm
 
 class SkipGram(nn.Module):
@@ -130,12 +132,6 @@ class DeepWalkWeighted:
         targets = torch.tensor(targets,dtype=torch.long,device=self.device)
         contexts = torch.tensor(contexts,dtype=torch.long,device=self.device)
         return targets, contexts
-    def neg_sampling(self):
-        node = np.random.randint(self.num_nodes)
-        mask = self.edge_index[0] != node
-        disconnect = self.edge_index[1][mask].cpu().numpy()
-        disconnect = np.random.choice(disconnect)
-        return node, disconnect
     
     def train(self):
         for _ in range(self.sampling_times):
@@ -154,10 +150,9 @@ class DeepWalkWeighted:
                     pos_scores = self.model(batch_targets, batch_contexts)
                     pos_labels = torch.ones_like(pos_scores)
                     
-                    neg = [self.neg_sampling() for i in range(batch_targets.size(0) * 3 // 4 )]
-                    neg = torch.tensor(neg, dtype=torch.long, device=self.device)
-                    neg_targets = neg[:,0]
-                    neg_contexts = neg[:,1]
+                    neg = negative_sampling(self.edge_index,self.num_nodes,batch_targets.size(0) * 3 // 4)
+                    neg_targets = neg[0].to(self.device)
+                    neg_contexts = neg[1].to(self.device)
                     neg_scores = self.model(neg_targets, neg_contexts)
                     neg_labels = torch.zeros_like(neg_scores)
                     
