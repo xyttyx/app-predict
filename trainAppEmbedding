@@ -30,6 +30,7 @@ HeteroGraph = pickle.load(open("./Dataset/graph_data.pkl", "rb"))
 edge_index_app = HeteroGraph['app', 'to', 'app'].edge_index
 edge_weight_app = HeteroGraph['app', 'to', 'app'].attr
 app_num = 1696
+device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 model = DeepWalkWeighted(
     num_nodes=app_num,
@@ -37,10 +38,12 @@ model = DeepWalkWeighted(
     edge_weight=edge_weight_app,
     embedding_size=200,
     walk_length=5,
-    num_walks=50,
-    batch_size=128,
-    lr = 1e-4,
-    epochs=5,
+    num_walks=30,
+    batch_size=256,
+    lr = 5e-3,
+    epochs=50,
+    sampling_times=10,
+    device=device
 )
 
 
