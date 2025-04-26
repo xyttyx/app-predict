@@ -22,9 +22,7 @@ class ModelLSTM(nn.Module):
         self.app_embedding = nn.Embedding(app_number, app_embedding_dim)
         self.user_embedding = nn.Embedding(user_number, user_embedding_dim)
         if use_poi:
-            if poi_embedding is not None:
-                poi_embedding = torch.tensor(poi_embedding)
-            else:
+            if poi_embedding is None:
                 poi_embedding = torch.randn(poi_number, poi_embedding_dim)
             self.poi_embedding = nn.Embedding.from_pretrained(poi_embedding, freeze=True)
             self.lstm_input_dim = app_embedding_dim + time_dim + poi_embedding.size(1)
