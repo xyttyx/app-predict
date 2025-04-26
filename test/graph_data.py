@@ -7,12 +7,10 @@ import pickle
 
 import torch
 import torch.nn as nn
-from torch_geometric.data import Data, HeteroData
+from torch_geometric.data import  HeteroData
 
 from utils import AppDataset
 
-with open("./Dataset/graph_data.pkl","rb") as f:
-    graph = torch.load(f, weights_only=False)
 
 dataset = AppDataset()
 data = dataset.App_usage_trace_origin
@@ -38,18 +36,11 @@ for i in range(len(data) - 1):
 app2time = set(app2time)
 app2time = list(app2time)
 
-appfeatures = torch.randn(1696, 64) 
-locfeatures = torch.randn(9851, 64)  
-timefeatures = torch.randn(720, 64)  
-
 data = HeteroData()
-data['app'].x = appfeatures
-data['loc'].x = locfeatures
-data['time'].x = timefeatures
-data['app', 'to', 'app'].edge_index = torch.tensor(app2app).t()
+data['app', 'to', 'app'].edge_index = torch.tensor(app2app_filtered).t()
 data['app', 'to', 'app'].attr = torch.tensor(app2app_weight)
 data['app', 'in', 'time'].edge_index = torch.tensor(app2time).t()
 data['app', 'at', 'loc'].edge_index = torch.tensor(app2loc).t()
 
 with open("./Dataset/graph_data.pkl", "wb") as f:
-    torch.save(data,f)
+    pickle.dump(data,f)
