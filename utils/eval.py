@@ -29,6 +29,6 @@ def Eval(
 
         # Print the metrics
         info = f"Eval:\n"
-        for key,value in metrics_data:
+        for key,value in metrics_data.items() :
             info += f"Acc@{key}: {value:.4f} | "
         print(info)
