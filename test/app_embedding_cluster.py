@@ -19,7 +19,7 @@ user_embedding_dim = config.user_embedding_dim
 seq_length = config.seq_length
 use_poi = True
 poi_embedding = None
-
+'''
 model = ModelAttention(
             app_number=app_number,
             user_number=user_number,
@@ -30,8 +30,8 @@ model = ModelAttention(
             poi_embedding=poi_embedding,
         ).to(device='cpu')
 
-model.load_state_dict(torch.load("./Save/model/model_attn_with_poi_newest.pth", map_location=torch.device('cpu')))
-app_embedding = model.app_embedding.weight.data.cpu().numpy()
+model.load_state_dict(torch.load("./Dataset/model_attn_with_poi_newest.pth", map_location=torch.device('cpu')))'''
+app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False)
 
 with open("Dataset/App2Category.txt", "r") as f:
     catagory = f.readlines()
