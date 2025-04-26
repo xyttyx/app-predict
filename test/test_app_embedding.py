@@ -20,6 +20,7 @@ seq_length = config.seq_length
 use_poi = True
 poi_embedding = None
 
+'''
 model = ModelAttention(
             app_number=app_number,
             user_number=user_number,
@@ -32,18 +33,21 @@ model = ModelAttention(
 
 model.load_state_dict(torch.load("./Save/model/model_attn_with_poi_newest.pth", map_location=torch.device('cpu')))
 app_embedding = model.app_embedding.weight.data.cpu().numpy()
+'''
 
+app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False).cpu().numpy()
 with open("Dataset/App2Category.txt", "r") as f:
     catagory = f.readlines()
     catagory = [line.strip().split() for line in catagory]
     catagory = [int(line[1]) for line in catagory]
     catagory = np.array(catagory)
-
+'''
 count = np.bincount(catagory)
 print("Cluster counts:")
 for i, c in enumerate(count):
     print(f"Category {i}: {c} samples")
 print("----------------------------------------------------------")
+'''
 
 tsne_2d = TSNE(n_components=2, random_state=42)
 embedding_2d = tsne_2d.fit_transform(app_embedding)

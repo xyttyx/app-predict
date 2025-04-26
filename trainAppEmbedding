@@ -32,20 +32,22 @@ edge_weight_app = HeteroGraph['app', 'to', 'app'].attr
 app_num = 1696
 device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
+pretrained_weight = torch.load("./Dataset/app_embeddings.pt", weights_only=False)
+
 model = DeepWalkWeighted(
     num_nodes=app_num,
     edge_index=edge_index_app,
     edge_weight=edge_weight_app,
     embedding_size=200,
+    pretrained_weight = pretrained_weight,
     walk_length=5,
-    num_walks=20,
+    num_walks=1,
     batch_size=256,
     lr = 5e-3,
     epochs=30,
     sampling_times=5,
     device=device
 )
-
 
 embeddings = model.train()
 torch.save(embeddings, "./Dataset/app_embeddings.pt")
