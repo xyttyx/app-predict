@@ -41,11 +41,11 @@ model = DeepWalkWeighted(
     embedding_size=200,
     pretrained_weight = pretrained_weight,
     walk_length=5,
-    num_walks=20,
+    num_walks=30,
     batch_size=256,
     lr = 1e-4,
     epochs=20,
-    sampling_times=5,
+    sampling_times=20,
     device=device
 )
 
