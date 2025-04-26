@@ -59,5 +59,3 @@ score = silhouette_score(X_scaled, labels)
 print(f"Silhouette Score = {score:.3f}")
 score = calinski_harabasz_score(X_scaled, labels)
 print(f"CH Index = {score:.1f}")
-
-# lstm的app嵌入向量，轮廓系数-0.437，表明真实标签的聚类效果不好，可能是因为嵌入的维度过高，或者数据本身的分布不适合聚类。
