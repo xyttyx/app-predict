@@ -171,7 +171,6 @@ class DeepWalkWeighted:
                 
                 print(f"Epoch {epoch+1}/{self.epochs}, Loss: {total_loss/len(dataloader):.4f}")
             
-            self.model.normalize_embeddings()
             torch.save(self.model.get_embeddings().cpu(), "./Dataset/app_embeddings.pt")
         # 获取嵌入矩阵
         embeddings = self.model.get_embeddings().cpu()
