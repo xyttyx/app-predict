@@ -8,6 +8,7 @@ def Eval(
     model,
     dataloader,
     device,
+    k=1
 ):
     with torch.no_grad():
         y_total = []
@@ -24,14 +25,10 @@ def Eval(
         # Calculate metrics
         y_total = torch.cat(y_total, dim=0).cpu().numpy()
         target_total = torch.cat(target_total, dim=0).cpu().numpy()
-        metrics_data = metrics(target_total, y_total, n_classes=model.app_number)
+        metrics_data = metrics(target_total, y_total, n_classes=model.app_number,k=k)
 
         # Print the metrics
-        print(
-            f"Eval:\n"+
-            f"Acc@1: {metrics_data['accuracy@1']:.4f} | "+
-            f"Acc@2: {metrics_data['accuracy@2']:.4f} | "+
-            f"Acc@3: {metrics_data['accuracy@3']:.4f} | "+
-            f"Acc@4: {metrics_data['accuracy@4']:.4f} | "+
-            f"Acc@5: {metrics_data['accuracy@5']:.4f}"
-        )
+        info = f"Eval:\n"
+        for key,value in metrics_data:
+            info += f"Acc@{key}: {value:.4f} | "
+        print(info)

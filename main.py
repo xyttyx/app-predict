@@ -99,10 +99,10 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
         print("No model found, starting training from scratch.")
 
     # 导入预训练的app嵌入
-    app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False).to(device)
-    model.app_embedding.weight.data.copy_(app_embedding)
-    for param in model.app_embedding.parameters():
-        param.requires_grad = False
+    #app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False).to(device)
+    #model.app_embedding.weight.data.copy_(app_embedding)
+    #for param in model.app_embedding.parameters():
+    #    param.requires_grad = False
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
@@ -118,23 +118,20 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
             device=device,
             epoch=epoch
         )
-        if False:
-        # if epoch % (train_epochs // 3) == 0 :
+        # if False:
+        if epoch % 5 == 0 :
+            k = 5 if epoch % 25 == 0 else 1
             Eval(
                 model=model,
                 dataloader=val_dataloader,
                 device=device,
+                k=k
             )
         scheduler.step()
         # 保存模型
         torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth"))
-        if epoch % 5 == 0:
+        if epoch % 10 == 0:
             torch.save(model.state_dict(), os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_{epoch}.pth"))
-    Eval(
-        model=model,
-        dataloader=val_dataloader,
-        device=device,
-    )
 if __name__ == "__main__":
     main(config_lstm, use_poi=True)
     
