@@ -46,6 +46,7 @@ class DeepWalkWeighted:
                  edge_weight: torch.Tensor,
                  num_nodes: int,
                  walk_length: int = 80,
+                 pretrained_weight = None,
                  num_walks: int = 10,
                  embedding_size: int = 128,
                  batch_size: int = 128,
@@ -81,6 +82,8 @@ class DeepWalkWeighted:
         
         # 初始化Skip-gram模型
         self.model = SkipGram(num_nodes, embedding_size).to(device)
+        if pretrained_weight is not None:
+            self.model.embeddings.weight.data.copy_(pretrained_weight)
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
         self.loss_fn = nn.BCELoss()
     def get_neighbors(self, node: int) -> List[int]:
@@ -127,6 +130,12 @@ class DeepWalkWeighted:
         targets = torch.tensor(targets,dtype=torch.long,device=self.device)
         contexts = torch.tensor(contexts,dtype=torch.long,device=self.device)
         return targets, contexts
+    def neg_sampling(self):
+        node = np.random.randint(self.num_nodes)
+        mask = self.edge_index[0] != node
+        disconnect = self.edge_index[1][mask].cpu().numpy()
+        disconnect = np.random.choice(disconnect)
+        return node, disconnect
     
     def train(self):
         for _ in range(self.sampling_times):
@@ -145,8 +154,10 @@ class DeepWalkWeighted:
                     pos_scores = self.model(batch_targets, batch_contexts)
                     pos_labels = torch.ones_like(pos_scores)
                     
-                    neg_targets = torch.randint(0, self.num_nodes, (batch_contexts.shape[0] * 3 // 4,), dtype=torch.long,device=self.device)
-                    neg_contexts = torch.randint(0, self.num_nodes, (batch_contexts.shape[0] * 3 // 4,), dtype=torch.long,device=self.device)
+                    neg = [self.neg_sampling() for i in range(batch_targets.size(0) * 3 // 4 )]
+                    neg = torch.tensor(neg, dtype=torch.long, device=self.device)
+                    neg_targets = neg[:,0]
+                    neg_contexts = neg[:,1]
                     neg_scores = self.model(neg_targets, neg_contexts)
                     neg_labels = torch.zeros_like(neg_scores)
                     
