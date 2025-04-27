@@ -1,0 +1,72 @@
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import torch
+import pickle
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import pearsonr
+
+from utils.functional import get_neighbors
+
+app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False).cpu()
+HeteroGraph = pickle.load(open("./Dataset/graph_data.pkl", "rb"))
+HeteroGraph = pickle.load(open("./Dataset/graph_data.pkl", "rb"))
+edge_index_app = HeteroGraph['app', 'to', 'app'].edge_index
+edge_weight_app = HeteroGraph['app', 'to', 'app'].attr
+
+indices = []          # 横坐标 i
+weights = []          # neighbor_weight
+similarities = []     # similarity
+src_nodes = range(1696)
+for src_node in src_nodes:
+    neighbors, neighbor_weights = get_neighbors(src_node, edge_index_app, edge_weight_app)
+    neighbor_weights = neighbor_weights.to(dtype=torch.double)
+    neighbor_weights = neighbor_weights / neighbor_weights.sum()
+    src_feature = app_embedding[src_node]
+    neighbor_features = app_embedding[neighbors]
+
+    for i in range(len(neighbor_weights)):
+        neighbor_feature = neighbor_features[i]
+        neighbor_weight = neighbor_weights[i]
+        similarity = torch.nn.functional.cosine_similarity(src_feature, neighbor_feature,dim=0)
+
+        #print(f"weight:{neighbor_weight.item()}, similarity:{similarity.item()}")
+
+        indices.append(i)
+        weights.append(neighbor_weight.item())
+        similarities.append(similarity.item())
+
+fig, ax1 = plt.subplots(figsize=(10, 6))
+similarities = np.array(similarities)
+weights = np.array(weights)
+
+corr, p_value = pearsonr(similarities,weights)
+print(f"r = {corr:.4f}, p-value = {p_value:.4f}")
+# 相关系数为0.393，说明存在弱相关
+
+
+'''# 绘制 weight 折线（左侧纵轴）
+ax1.plot(indices, weights, 'b-', label='Weight', marker='o')
+ax1.set_xlabel('Index (i)')
+ax1.set_ylabel('Weight', color='b')
+ax1.tick_params(axis='y', labelcolor='b')
+
+# 创建右侧纵轴（共享横坐标）
+ax2 = ax1.twinx()
+
+# 绘制 similarity 折线（右侧纵轴）
+ax2.plot(indices, similarities, 'r-', label='Similarity', marker='s')
+ax2.set_ylabel('Cosine Similarity', color='r')
+ax2.tick_params(axis='y', labelcolor='r')
+
+# 添加标题和图例
+plt.title('Neighbor Weight vs. Cosine Similarity')
+ax1.legend(loc='upper left')
+ax2.legend(loc='upper right')
+
+# 显示图形
+plt.show()
+'''
