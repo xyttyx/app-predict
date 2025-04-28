@@ -9,7 +9,6 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import numpy as np
 
-from Models import ModelLSTM, ModelAttention
 from config import config_attn as config
 
 app_number = config.app_number
