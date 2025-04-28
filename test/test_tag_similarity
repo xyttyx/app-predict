@@ -1,0 +1,30 @@
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import numpy as np
+import pickle
+import torch
+
+with open("./Dataset/App2Category.txt") as f:
+    Categories = f.readlines()
+    Categories = [int(line.strip().split()[1]) for line in Categories]
+    Categories = np.array(Categories)
+
+HeteroGraph = pickle.load(open("./Dataset/graph_data.pkl", "rb"))
+
+edge_index_app = HeteroGraph['app', 'to', 'app'].edge_index.cpu().numpy()
+edge_weight_app = HeteroGraph['app', 'to', 'app'].attr.cpu().numpy()
+
+edge_categories = np.zeros_like(edge_index_app,)  # 初始化结果数组
+# 替换源节点和目标节点的值为类别
+edge_categories[0, :] = Categories[edge_index_app[0, :]]  # 源节点类别
+edge_categories[1, :] = Categories[edge_index_app[1, :]]  # 目标节点类别
+is_same=edge_categories[1, :]==edge_categories[0, :]
+similarity = np.sum(edge_weight_app[is_same])/np.sum(edge_weight_app)
+
+same_tag = np.sum(is_same)/is_same.size
+print(f"same tag:{same_tag}")
+print(f"similarity:{similarity}")
+# same tag:0.32437283831706143
+# similarity:0.5733728974134387
