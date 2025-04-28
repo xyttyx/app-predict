@@ -11,7 +11,7 @@ with open("./Dataset/App2Category.txt") as f:
     Categories = [int(line.strip().split()[1]) for line in Categories]
     Categories = np.array(Categories)
 
-HeteroGraph = pickle.load(open("./Dataset/graph_data.pkl", "rb"))
+HeteroGraph = pickle.load(open("./Dataset/graph.pkl", "rb"))
 
 edge_index_app = HeteroGraph['app', 'to', 'app'].edge_index.cpu().numpy()
 edge_weight_app = HeteroGraph['app', 'to', 'app'].attr.cpu().numpy()
