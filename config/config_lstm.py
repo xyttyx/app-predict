@@ -2,6 +2,7 @@ app_number = 1696
 user_number = 702
 app_embedding_dim = 200
 user_embedding_dim = 50
+time_embedding_dim = 54
 seq_length = 7
 train_epochs = 50
 learning_rate = 1e-4

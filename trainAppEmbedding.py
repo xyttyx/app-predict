@@ -30,9 +30,22 @@ HeteroGraph = pickle.load(open("./Dataset/graph_data.pkl", "rb"))
 edge_index_app = HeteroGraph['app', 'to', 'app'].edge_index
 edge_weight_app = HeteroGraph['app', 'to', 'app'].attr
 app_num = 1696
+first_time = False
 device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
-pretrained_weight = torch.load("./Dataset/app_embeddings.pt", weights_only=False)
+if first_time:
+    with open("Dataset/App2Category.txt", "r") as f:
+        catagory = f.readlines()
+        catagory = [line.strip().split() for line in catagory]
+        catagory = [int(line[1]) for line in catagory]
+        catagory = torch.tensor(catagory)
+    catagory_embedding = torch.rand((20,200)) * 2 - 1
+    pretrained_weight = torch.zeros((1696,200))
+    for i in range(0,1696):
+        pretrained_weight[i] = (catagory_embedding[catagory[i]] + torch.rand((200,)))
+else:
+    pretrained_weight = torch.load("./Dataset/app_embeddings.pt", weights_only=False)
+
 
 model = DeepWalkWeighted(
     num_nodes=app_num,
@@ -41,11 +54,11 @@ model = DeepWalkWeighted(
     embedding_size=200,
     pretrained_weight = pretrained_weight,
     walk_length=5,
-    num_walks=30,
+    num_walks=50,
     batch_size=256,
     lr = 1e-4,
     epochs=20,
-    sampling_times=20,
+    sampling_times=5,
     device=device
 )
 

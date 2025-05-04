@@ -19,10 +19,12 @@ class AppDataset(Dataset):
             for i in range(len(App_usage_trace)):
                 line = App_usage_trace[i]
                 time = int(line[1]) % 1000000
+                hour = time // 10000
+                minute = (time % 10000) // 100
+                time = hour * 10 + minute//6
                 App_usage_trace[i] = torch.tensor((
                     int(line[0]),
-                    time // 10000,
-                    (time % 10000) // 200,
+                    time ,
                     int(line[2]),
                     int(line[3])
                 ))
@@ -33,7 +35,7 @@ class AppDataset(Dataset):
             for i in range(len(App_usage_trace) - (length + 1)):
                 seq = App_usage_trace[i : i + (length + 1)]
                 if seq[0][0] == seq[-1][0]:
-                    self.App_usage_trace.append((seq[0:-1], seq[-1, 4])),
+                    self.App_usage_trace.append((seq[0:-1], seq[-1, 3])),
         print("App usage trace loaded, total number of sequences: ", len(self.App_usage_trace))
             
     def __len__(self):

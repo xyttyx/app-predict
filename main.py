@@ -21,6 +21,7 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
         app_embedding_dim = config.app_embedding_dim
     if user_embedding_dim == None:
         user_embedding_dim = config.user_embedding_dim
+    time_embedding_dim = config.time_embedding_dim
     if seq_length == None:
         seq_length = config.seq_length
     train_epochs = config.train_epochs
@@ -72,6 +73,7 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
             user_number=user_number,
             app_embedding_dim=app_embedding_dim,
             user_embedding_dim=user_embedding_dim,
+            time_embedding_dim=time_embedding_dim,
             seq_length=seq_length,
             use_poi=use_poi,
             poi_embedding=poi_embedding,
@@ -90,10 +92,14 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
 
     # 加载模型
     if os.path.exists(os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth")):
-        model.load_state_dict(torch.load(os.path.join(Model_Save_Path, 
+        model_state_dict = model.state_dict()
+        saved_state_dict = torch.load(os.path.join(Model_Save_Path, 
                                                       f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth"), 
                                                       weights_only=True,
-                                                      map_location="cpu"))
+                                                      map_location="cpu")
+        filtered_state_dict = {k: v for k, v in saved_state_dict.items() if k in model_state_dict}
+        model_state_dict.update(filtered_state_dict)
+        model.load_state_dict(model_state_dict)
         print("Model loaded successfully.")
     else:
         print("No model found, starting training from scratch.")

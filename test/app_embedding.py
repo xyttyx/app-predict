@@ -48,8 +48,29 @@ for i, c in enumerate(count):
     print(f"Category {i}: {c} samples")
 print("----------------------------------------------------------")
 '''
+tsne_2d = TSNE(n_components=2, random_state=4242)
+embedding_3d = tsne_2d.fit_transform(app_embedding)
+plt.figure(figsize=(10, 8))
+plt.title("t-SNE 2D Visualization of App Embeddings")
+plt.xlabel("t-SNE 1")
+plt.ylabel("t-SNE 2")
 
-tsne_3d = TSNE(n_components=3, random_state=42)
+x = []
+y = []
+c = []
+for i in [1,3,5,10]:
+    mask = catagory == i
+    x_tmp = embedding_3d[:,0][mask][0:30]
+    y_tmp = embedding_3d[:,1][mask][0:30]
+    c_tmp = np.ones_like(x_tmp) * i 
+    x = np.concat([x,x_tmp])
+    y = np.concat([y,y_tmp])
+    c = np.concat([c,c_tmp])
+plt.scatter(x, y, c=c, cmap='rainbow', s=10)
+plt.show()
+
+
+tsne_3d = TSNE(n_components=3, random_state=4242)
 embedding_3d = tsne_3d.fit_transform(app_embedding)
 fig = plt.figure(figsize=(10, 10))
 ax = fig.add_subplot(111, projection='3d')
@@ -61,11 +82,11 @@ x = []
 y = []
 z = []
 c = []
-for i in [1,3,5,8]:
+for i in [1,3,5,10]:
     mask = catagory == i
-    x_tmp = embedding_3d[:,0][mask]
-    y_tmp = embedding_3d[:,1][mask]
-    z_tmp = embedding_3d[:,2][mask]
+    x_tmp = embedding_3d[:,0][mask][0:30]
+    y_tmp = embedding_3d[:,1][mask][0:30]
+    z_tmp = embedding_3d[:,2][mask][0:30]
     c_tmp = np.ones_like(x_tmp) * i 
     x = np.concat([x,x_tmp])
     y = np.concat([y,y_tmp])
@@ -74,7 +95,7 @@ for i in [1,3,5,8]:
 ax.scatter(x, y, z, c=c, cmap='rainbow', s=10)
 plt.show()
 
-kmeans = KMeans(n_clusters=20, random_state=42)
+'''kmeans = KMeans(n_clusters=20, random_state=42)
 labels = kmeans.fit_predict(app_embedding)
 
 count = np.bincount(labels)
@@ -91,4 +112,4 @@ ax.set_xlabel("t-SNE 1")
 ax.set_ylabel("t-SNE 2")
 ax.set_zlabel("t-SNE 3")
 ax.scatter(embedding_3d[:,0], embedding_3d[:, 1], embedding_3d[:, 2], c=labels, cmap='rainbow', s=10)
-plt.show()
+plt.show()'''
