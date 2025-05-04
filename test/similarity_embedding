@@ -13,7 +13,6 @@ from utils.functional import get_neighbors
 
 app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False).cpu()
 HeteroGraph = pickle.load(open("./Dataset/graph_data.pkl", "rb"))
-HeteroGraph = pickle.load(open("./Dataset/graph_data.pkl", "rb"))
 edge_index_app = HeteroGraph['app', 'to', 'app'].edge_index
 edge_weight_app = HeteroGraph['app', 'to', 'app'].attr
 
