@@ -39,7 +39,20 @@ with open("Dataset/App2Category.txt", "r") as f:
     catagory = np.array(catagory)
 
 app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False).cpu().numpy()
-X_scaled = app_embedding
+model_state = torch.load('./Save/model/model_lstm_with_poi_newest.pth', weights_only=False,map_location="cpu")
+weights = model_state["weights"]
+phases = model_state["phases"]
+time_embedding = weights * torch.tensor(list(range(240))).unsqueeze(-1) + phases
+time_embedding[:,1:] = torch.sin(time_embedding[:,1:])
+time_embedding = time_embedding.numpy()
+time_embedding = torch.randn((240,54),)  * 10
+time_catagory = []
+for i in range(1,9):
+    tmp = torch.ones((30,)) * i
+    time_catagory.append(tmp)
+time_catagory = torch.cat(time_catagory).numpy()
+X_scaled = time_embedding
+labels = time_catagory
 
 print("Silhouette Score and Calinski-Harabasz Index for different number of clusters:")
 print("----------------------------------------------------------")
@@ -53,7 +66,7 @@ for n_clusters in range(15, 21):
     print(f"CH Index = {score:.1f}")
 
 print("----------------------------------------------------------")
-labels = catagory
+labels = time_catagory
 print("Using ground truth labels:")
 score = silhouette_score(X_scaled, labels)
 print(f"Silhouette Score = {score:.3f}")

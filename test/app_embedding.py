@@ -33,13 +33,52 @@ model = ModelAttention(
 model.load_state_dict(torch.load("./Save/model/model_attn_with_poi_newest.pth", map_location=torch.device('cpu')))
 app_embedding = model.app_embedding.weight.data.cpu().numpy()
 '''
-
-app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False).cpu().numpy()
 with open("Dataset/App2Category.txt", "r") as f:
     catagory = f.readlines()
     catagory = [line.strip().split() for line in catagory]
     catagory = [int(line[1]) for line in catagory]
     catagory = np.array(catagory)
+app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False).cpu().numpy()
+model_state = torch.load('./Save/model/model_lstm_with_poi_newest.pth', weights_only=False,map_location="cpu")
+weights = model_state["weights"]
+phases = model_state["phases"]
+time_embedding = weights * torch.tensor(list(range(240))).unsqueeze(-1) + phases
+time_embedding[:,1:] = torch.sin(time_embedding[:,1:])
+time_embedding = time_embedding.numpy()
+time_embedding = torch.randn((240,54),)  * 10
+
+time_catagory = []
+for i in range(1,9):
+    tmp = torch.ones((30,)) * i
+    time_catagory.append(tmp)
+time_catagory = torch.cat(time_catagory).numpy()
+
+tsne_2d = TSNE(n_components=2, random_state=4242)
+embedding_2d = tsne_2d.fit_transform(time_embedding)
+plt.figure(figsize=(10, 8))
+plt.title("t-SNE 2D Visualization of Time Embeddings")
+plt.xlabel("t-SNE 1")
+plt.ylabel("t-SNE 2")
+x = embedding_2d[:,0] * 2
+y = embedding_2d[:,1] * 2
+c = time_catagory
+plt.scatter(x, y, c=c, cmap='rainbow', s=10)
+plt.show()
+
+tsne_3d = TSNE(n_components=3, random_state=4242)
+embedding_3d = tsne_3d.fit_transform(time_embedding)
+fig = plt.figure(figsize=(10, 10))
+ax = fig.add_subplot(111, projection='3d')
+ax.set_title("t-SNE visualization of app embeddings")
+ax.set_xlabel("t-SNE 1")
+ax.set_ylabel("t-SNE 2")
+ax.set_zlabel("t-SNE 3")
+x = embedding_3d[:,0]
+y = embedding_3d[:,1]
+z = embedding_3d[:,2]
+c = time_catagory
+ax.scatter(x, y, z, c=c, cmap='rainbow', s=10)
+plt.show()
 '''
 count = np.bincount(catagory)
 print("Cluster counts:")
@@ -48,7 +87,7 @@ for i, c in enumerate(count):
 print("----------------------------------------------------------")
 '''
 tsne_2d = TSNE(n_components=2, random_state=4242)
-embedding_3d = tsne_2d.fit_transform(app_embedding)
+embedding_2d = tsne_2d.fit_transform(app_embedding)
 plt.figure(figsize=(10, 8))
 plt.title("t-SNE 2D Visualization of App Embeddings")
 plt.xlabel("t-SNE 1")
@@ -59,8 +98,8 @@ y = []
 c = []
 for i in [1,3,5,10]:
     mask = catagory == i
-    x_tmp = embedding_3d[:,0][mask][0:30]
-    y_tmp = embedding_3d[:,1][mask][0:30]
+    x_tmp = embedding_2d[:,0][mask][0:30]
+    y_tmp = embedding_2d[:,1][mask][0:30]
     c_tmp = np.ones_like(x_tmp) * i 
     x = np.concat([x,x_tmp])
     y = np.concat([y,y_tmp])

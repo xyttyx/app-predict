@@ -19,10 +19,11 @@ class ModelLSTM(nn.Module):
         super(ModelLSTM, self).__init__()
         self.app_number = app_number
         self.user_number = user_number
-        time_dim = 54
+        time_dim = time_embedding_dim
         self.app_embedding = nn.Embedding(app_number, app_embedding_dim)
         self.user_embedding = nn.Embedding(user_number, user_embedding_dim)
-        self.time_embedding = nn.Embedding(240, time_embedding_dim)
+        self.weights = nn.Parameter(torch.randn(time_embedding_dim))
+        self.phases = nn.Parameter(torch.randn(time_embedding_dim))
         if use_poi:
             if poi_embedding is None:
                 poi_embedding = torch.randn(poi_number, poi_embedding_dim)
@@ -48,10 +49,12 @@ class ModelLSTM(nn.Module):
 
     def forward(self, x):
         apps = x[:, :, 3]
-        times = x[:, :, 1]
+        times = x[:, :, 1].unsqueeze(-1)
         users = x[:, 0, 0]
-        times = self.time_embedding(times)
-
+        t2v = self.weights * times + self.phases
+        times = t2v.clone()
+        times[:,:, 1:] = torch.sin(t2v[:,:, 1:])
+        
         apps = self.app_embedding(apps)
         users = self.user_embedding(users)
         input = torch.cat([apps, times], dim=2)

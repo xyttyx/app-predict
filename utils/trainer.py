@@ -20,6 +20,7 @@ def Trainer(
     # Train the model
     for item in tqdm(dataloader):
         x, target = item
+        print(x[0],target[0])
         x = x.to(device)
         target = target.to(device)
 
@@ -32,6 +33,8 @@ def Trainer(
         
         running_loss += loss.item()
         prediction = torch.argmax(y, dim=1)
+        print(prediction[0:10])
+        print(target[0:10])
         prediction_total.append(prediction)
         target_total.append(target)
         

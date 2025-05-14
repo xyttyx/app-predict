@@ -88,8 +88,8 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
             seq_length=seq_length,
             use_poi=use_poi,
             poi_embedding=poi_embedding,
-        ).to(device)
-
+            ).to(device)
+    
     # 加载模型
     if os.path.exists(os.path.join(Model_Save_Path, f"model_{model_name}_{"with" if use_poi else "without"}_poi_newest.pth")):
         model_state_dict = model.state_dict()
@@ -103,7 +103,7 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
         print("Model loaded successfully.")
     else:
         print("No model found, starting training from scratch.")
-
+    
     # 导入预训练的app嵌入
     app_embedding = torch.load('./Dataset/app_embeddings.pt', weights_only=False).to(device)
     model.app_embedding.weight.data.copy_(app_embedding)
@@ -112,7 +112,7 @@ def main(config, seq_length:int|None = None, app_embedding_dim:int|None = None, 
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=train_epochs, eta_min=learning_rate / 100)
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=train_epochs, eta_min=learning_rate / 10)
 
     # 训练模型
     for epoch in range(1, train_epochs + 1):
