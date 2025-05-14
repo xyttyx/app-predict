@@ -20,7 +20,9 @@ def Trainer(
     # Train the model
     for item in tqdm(dataloader):
         x, target = item
-        print(x[0],target[0])
+        print("输入向量：")
+        print(x[0])
+        print("目标APP：", target[0])
         x = x.to(device)
         target = target.to(device)
 
@@ -33,8 +35,12 @@ def Trainer(
         
         running_loss += loss.item()
         prediction = torch.argmax(y, dim=1)
-        print(prediction[0:10])
+        prediction5 = y.topk(5)[1].T
+        print("目标APP")
         print(target[0:10])
+        print("Top 5 预测APP")
+        torch.set_printoptions(threshold=float('inf'))
+        print(prediction5[:, 0:10])
         prediction_total.append(prediction)
         target_total.append(target)
         
